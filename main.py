@@ -9,20 +9,27 @@ client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 @app.route('/chat', methods=['POST'])
 def chat():
-    data = request.get_json()
-    prompt = data.get("prompt", "")
-
-    if not prompt:
-        return jsonify({"error": "No prompt provided"}), 400
-
     try:
+        # Ensure request is JSON
+        data = request.get_json(force=True)  # This prevents 400 errors
+
+        # Check if 'prompt' exists
+        if "prompt" not in data:
+            return jsonify({"error": "Missing 'prompt' parameter"}), 400
+
+        prompt = data["prompt"]
+
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",  # Change to "gpt-4" if needed
+            model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}]
         )
+
+        # Send only the response text, no extra nesting
         return jsonify({"response": response.choices[0].message.content})
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8080)
