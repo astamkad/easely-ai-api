@@ -4,8 +4,8 @@ import os
 
 app = Flask(__name__)
 
-# Load OpenAI API Key
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# Initialize OpenAI client correctly
+client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -16,9 +16,8 @@ def chat():
         return jsonify({"error": "No prompt provided"}), 400
 
     try:
-        client = openai.OpenAI()  # Initialize the OpenAI client
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",  # Update if using GPT-4
+            model="gpt-3.5-turbo",  # Change to "gpt-4" if needed
             messages=[{"role": "user", "content": prompt}]
         )
         return jsonify({"response": response.choices[0].message.content})
