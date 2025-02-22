@@ -16,11 +16,12 @@ def chat():
         return jsonify({"error": "No prompt provided"}), 400
 
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # Change to gpt-4 if you have API access
+        client = openai.OpenAI()  # Initialize the OpenAI client
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",  # Update if using GPT-4
             messages=[{"role": "user", "content": prompt}]
         )
-        return jsonify({"response": response["choices"][0]["message"]["content"]})
+        return jsonify({"response": response.choices[0].message.content})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
